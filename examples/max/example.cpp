@@ -1,6 +1,6 @@
-#include "maxcpp5.h"
+#include "maxcpp6.h"
 
-class Example : public MaxCpp5<Example> {
+class Example : public MaxCpp6<Example> {
 public:
 	Example(t_symbol * sym, long ac, t_atom * av) { 
 		setupIO(2, 2); // inlets / outlets
@@ -9,16 +9,16 @@ public:
 	
 	// methods:
 	void bang(long inlet) { 
-		outlet_bang(m_outlet[0]);
+		outlet_bang(m_outlets[0]);
 	}
 	void testfloat(long inlet, double v) { 
-		outlet_float(m_outlet[0], v);
+		outlet_float(m_outlets[0], v);
 	}
 	void testint(long inlet, long v) { 
-		outlet_int(m_outlet[0], v);
+		outlet_int(m_outlets[0], v);
 	}
 	void test(long inlet, t_symbol * s, long ac, t_atom * av) { 
-		outlet_anything(m_outlet[1], gensym("test"), ac, av); 
+		outlet_anything(m_outlets[1], gensym("test"), ac, av); 
 	}
 };
 

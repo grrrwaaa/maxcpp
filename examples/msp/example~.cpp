@@ -1,13 +1,19 @@
-#include "maxcpp5.h"
+#include "maxcpp6.h"
 
 
-class Example : public MspCpp5<Example> {
+// inherit from the MSP base class, template-specialized for myself:
+
+class Example : public MspCpp6<Example> {
 public:
+
 	Example(t_symbol * sym, long ac, t_atom * av) { 
-		setupIO(&Example::perform, 2, 2); 
-		post("created an example"); 
+		setupIO(2, 2); 
+		post("object created"); 
 	}
-	~Example() { post("freed an example"); }	
+	
+	~Example() { 
+		post("object freed"); 
+	}	
 	
 	// methods:
 	void bang(long inlet) { 
@@ -18,14 +24,16 @@ public:
 	}
 	
 	// optional method: gets called when the dsp chain is modified
-	void dsp() { post("user-dsp"); }
+	void dsp() { 
+		post("dsp chain changed"); 
+	}
 	
 	// signal processing example: inverts sign of inputs
-	void perform(int vs, t_sample ** inputs, t_sample ** outputs) {
-		for (int channel = 0; channel < 2; channel++) {
-			t_sample * in = inputs[channel];
-			t_sample * out = outputs[channel];
-			for (int i=0; i<vs; i++) {
+	void perform(double **ins, long numins, double **outs, long numouts, long sampleframes) {
+		for (long channel = 0; channel < numouts; channel++) {
+			double * in = ins[channel];
+			double * out = outs[channel];
+			for (long i=0; i < sampleframes; i++) {
 				out[i] = -in[i];
 			}
 		}
