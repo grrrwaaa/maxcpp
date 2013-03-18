@@ -20,7 +20,7 @@ Thanks to Oli Larkin and Thijs Koerselman for feedback and contributions.
 
 ## Sample code (Max object)
 
-```
+```cpp
 #include "maxcpp6.h"
 
 class Example : public MaxCpp6<Example> {
@@ -57,7 +57,7 @@ C74_EXPORT extern "C" int main(void) {
 
 ## Sample code (MSP object)
 
-```
+```cpp
 #include "maxcpp6.h"
 
 // inherit from the MSP base class, template-specialized for myself:
