@@ -10,13 +10,13 @@ Previously hosted at [Google Code](https://code.google.com/p/maxcpp), updated an
 
 To develop Max/MSP projects, you will first need the Max SDK, available from [Cycling `74](http://cycling74.com/products/sdk) (also mirrored [on github](https://github.com/Cycling74/max6-sdk))
 
-Since the source files will be C++, the ```main``` function needs to be qualified with ```extern "C"```.
-
 The source trunk includes headers, examples and Xcode project / Visual C++ project files. The example projects should work 'out of the box' if the this repo is placed inside your MaxSDK folder (next to the c74support folder). 
 
-Thanks to Oli Larkin and Thijs Koerselman for feedback and contributions.
+Since the source files will be C++, the ```main``` function needs to be qualified with ```extern "C"```.
 
 Caveats: it almost surely won't work with virtuals or multiple inheritance. Also be careful not to include the header twice, or there'll be linker errors for duplicate m_class symbols.
+
+Thanks to Oli Larkin and Thijs Koerselman for feedback and contributions.
 
 ## Sample code (Max object)
 
