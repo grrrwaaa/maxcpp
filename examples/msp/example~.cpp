@@ -1,6 +1,5 @@
 #include "maxcpp6.h"
 
-
 // inherit from the MSP base class, template-specialized for myself:
 
 class Example : public MspCpp6<Example> {
@@ -23,13 +22,9 @@ public:
 		post("%s in inlet %i (%i args)", s->s_name, inlet, ac);
 	}
 	
-	// optional method: gets called when the dsp chain is modified
-	void dsp() { 
-		post("dsp chain changed"); 
-	}
-	
-	// signal processing example: inverts sign of inputs
+	// default signal processing method is called 'perform'
 	void perform(double **ins, long numins, double **outs, long numouts, long sampleframes) {
+		// example code to invert inputs
 		for (long channel = 0; channel < numouts; channel++) {
 			double * in = ins[channel];
 			double * out = outs[channel];
@@ -38,9 +33,16 @@ public:
 			}
 		}
 	}
+	
+//	// optional method: gets called when the dsp chain is modified
+//	// if not given, the MspCpp will use Example::perform by default
+//	void dsp(t_object * dsp64, short *count, double samplerate, long maxvectorsize, long flags) { 
+//		// specify a perform method manually:
+//		REGISTER_PERFORM(Example, perform);
+//	}
 };
 
-extern "C" int main(void) {
+C74_EXPORT extern "C" int main(void) {
 	// create a class with the given name:
 	Example::makeMaxClass("example~");
 	REGISTER_METHOD(Example, bang);

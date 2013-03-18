@@ -14,7 +14,7 @@ note: this probably won't work with virtuals -- and definitely won't work with m
 -- licence --
 maxcpp is distributed under the permissive BSD-like MIT licence:
 
-Copyright (c) 2009 Graham Wakefield
+Copyright (c) 2009-2013 Graham Wakefield
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -78,6 +78,15 @@ THE SOFTWARE.
 	#METHOD,												\
 	A_LONG,												\
 	0);
+	
+// for DSP
+#define REGISTER_PERFORM(CLASS, METHOD) object_method( \
+	dsp64, \
+	gensym("dsp_add64"), \
+	(t_object *)this, \
+	MaxMethodPerform64<&CLASS::METHOD>::call,\
+	0, \
+	NULL);
 
 // a purely static base class for Max and MSP objects:
 template <typename T>
@@ -166,16 +175,23 @@ template <typename T>
 class MspCpp6 : public MaxCppBase<T> {
 public:
 
+	typedef void (T::*maxmethod_perform64)(double **ins, long numins, double **outs, long numouts, long sampleframes);
+	template<maxmethod_perform64 F>
+	struct MaxMethodPerform64 {
+		static void call(T *x, t_object *dsp64, double **ins, long numins, double **outs, long numouts, long sampleframes, long flags, void *userparam) { 
+			((x)->*F)(ins, numins, outs, numouts, sampleframes); 
+		}
+	};
+
 	t_pxobject m_ob; 
-	 
-	 
+	
+	
 	static t_class * makeMaxClass(const char * classname) {
 		common_symbols_init();
 		t_class * c = class_new(classname, (method)MspCpp6<T>::maxcpp_create, (method)MspCpp6<T>::maxcpp_destroy, sizeof(T), NULL, A_GIMME, 0);
 		class_dspinit(c);
 		
 		class_addmethod(c, (method)MspCpp6<T>::maxcpp_dsp64, "dsp64", A_CANT, 0);
-		
 		
 		class_register(CLASS_BOX, c);
 		MaxCppBase<T>::m_class = c;
@@ -199,23 +215,21 @@ public:
 	
 	static void maxcpp_destroy(t_object * x) {
 		dsp_free((t_pxobject *)x);
-		T * t = (T *)x;
-		t->~T();
+		((T *)x)->~T();
 	}
 	
 	static void maxcpp_dsp64(t_object *x, t_object *dsp64, short *count, double samplerate, long maxvectorsize, long flags) {
-		T * t = (T *)x;
-		object_method(dsp64, gensym("dsp_add64"), x, (method)MspCpp6<T>::maxcpp_perform64, 0, NULL); 
-		t->dsp();
+		((T *)x)->dsp(dsp64, count, samplerate, maxvectorsize, flags);
 	}
 	
 	static void maxcpp_perform64(t_object *x, t_object *dsp64, double **ins, long numins, double **outs, long numouts, long sampleframes, long flags, void *userparam) {
-        T * t = (T *)x;
-		t->perform(ins, numins, outs, numouts, sampleframes);
+        ((T *)x)->perform(ins, numins, outs, numouts, sampleframes);
     }
 	
 	// stub functions in case the user doesn't supply them:
-	void dsp() {}
+	void dsp(t_object * dsp64, short *count, double samplerate, long maxvectorsize, long flags) {
+		REGISTER_PERFORM(T, perform);
+	}
 	void perform(double **ins, long numins, double **outs, long numouts, long sampleframes) {}
 	
 	// C++ operator overload to treat MaxCpp6 objects as t_objects

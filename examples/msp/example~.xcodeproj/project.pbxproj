@@ -16,10 +16,8 @@
 		22CF119A0EE9A8250054F513 /* example~.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "example~.cpp"; sourceTree = "<group>"; };
 		22CF119D0EE9A82E0054F513 /* MaxAudioAPI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MaxAudioAPI.framework; path = "../../../c74support/msp-includes/MaxAudioAPI.framework"; sourceTree = SOURCE_ROOT; };
 		2FBBEAE508F335360078DB84 /* example~.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "example~.mxo"; sourceTree = BUILT_PRODUCTS_DIR; };
-		36C5492016F557E00054C037 /* jit.cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jit.cpp.h; sourceTree = "<group>"; };
-		36C5492116F557E00054C037 /* max.jit.cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = max.jit.cpp.h; sourceTree = "<group>"; };
-		36C5492216F557E00054C037 /* maxcpp5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = maxcpp5.h; sourceTree = "<group>"; };
 		36C5493616F558AA0054C037 /* maxcpp6.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = maxcpp6.h; sourceTree = "<group>"; };
+		36ECE19916F6A2860008CAFC /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -37,6 +35,7 @@
 		089C166AFE841209C02AAC07 /* iterator */ = {
 			isa = PBXGroup;
 			children = (
+				36ECE19916F6A2860008CAFC /* README.md */,
 				36C5491F16F557E00054C037 /* maxcpp */,
 				22CF10220EE984600054F513 /* maxmspsdk.xcconfig */,
 				22CF119A0EE9A8250054F513 /* example~.cpp */,
@@ -58,9 +57,6 @@
 			isa = PBXGroup;
 			children = (
 				36C5493616F558AA0054C037 /* maxcpp6.h */,
-				36C5492216F557E00054C037 /* maxcpp5.h */,
-				36C5492016F557E00054C037 /* jit.cpp.h */,
-				36C5492116F557E00054C037 /* max.jit.cpp.h */,
 			);
 			name = maxcpp;
 			path = ../../maxcpp;
