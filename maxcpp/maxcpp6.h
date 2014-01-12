@@ -51,33 +51,85 @@ THE SOFTWARE.
 
 // for A_NOTHING methods (e.g. bang):
 #define REGISTER_METHOD(CLASS, METHOD)	class_addmethod(	\
-	(t_class *)CLASS::m_class,								\
-	(method)CLASS::MaxMethod<&CLASS::METHOD>::call,			\
-	#METHOD,												\
-	0);	
+						(t_class *)CLASS::m_class,						\
+						(method)CLASS::MaxMethod<&CLASS::METHOD>::call, \
+						#METHOD,										\
+						0); 
+
+// for A_CANT methods (dblclick):
+#define REGISTER_METHOD_CANT(CLASS, METHOD) class_addmethod(	\
+						(t_class *)CLASS::m_class,							\
+						(method)CLASS::MaxMethodCant<&CLASS::METHOD>::call, \
+						#METHOD,		\
+						A_CANT,			\
+						0); 
+
+// for A_CANT methods (edclose):
+#define REGISTER_METHOD_EDCLOSE(CLASS, METHOD)	class_addmethod(	\
+						(t_class *)CLASS::m_class,								\
+						(method)CLASS::MaxMethodEdClose<&CLASS::METHOD>::call,	\
+						#METHOD,		\
+						A_CANT,			\
+						0); 
+
+// for A_CANT methods (assist):
+#define REGISTER_METHOD_ASSIST(CLASS, METHOD) class_addmethod(	\
+						(t_class *)CLASS::m_class,								\
+						(method)CLASS::MaxMethodAssist<&CLASS::METHOD>::call, \
+						#METHOD,		\
+						A_CANT,			\
+						0); 
+
+// for A_CANT methods (jsave)
+#define REGISTER_METHOD_JSAVE(CLASS, METHOD)	class_addmethod(	\
+						(t_class *)CLASS::m_class,								\
+						(method)CLASS::MaxMethodJsave<&CLASS::METHOD>::call,	\
+						#METHOD,		\
+						A_CANT,			\
+						0); 
+
 // for A_GIMME methods (t_symbol * s, long argc, void * argv):
 #define REGISTER_METHOD_GIMME(CLASS, METHOD)	class_addmethod(	\
-	(t_class *)CLASS::m_class,								\
-	(method)CLASS::MaxMethodGimme<&CLASS::METHOD>::call,	\
-	#METHOD,												\
-	A_GIMME,												\
-	0);	
-	
+						(t_class *)CLASS::m_class,								\
+						(method)CLASS::MaxMethodGimme<&CLASS::METHOD>::call,	\
+						#METHOD,												\
+						A_GIMME,												\
+						0);
+
+// for A_GIMMEBACK methods (t_symbol *s, long ac, t_atom *av, t_atom *rv):
+#define REGISTER_METHOD_GIMMEBACK(CLASS, METHOD)	class_addmethod(	\
+						(t_class *)CLASS::m_class,								\
+						(method)CLASS::MaxMethodGimmeback<&CLASS::METHOD>::call,	\
+						#METHOD,												\
+						A_GIMMEBACK,												\
+						0);
+
+// for A_DEFSYM methods (t_symbol *s) (par ex, read) :
+#define REGISTER_METHOD_DEFSYM(CLASS, METHOD) class_addmethod(	\
+						(t_class *)CLASS::m_class,								\
+						(method)CLASS::MaxMethodDefSym<&CLASS::METHOD>::call, \
+						#METHOD,												\
+						A_DEFSYM,												\
+						0); 
+
 // for A_FLOAT methods (double v):
 #define REGISTER_METHOD_FLOAT(CLASS, METHOD)	class_addmethod(	\
-	(t_class *)CLASS::m_class,								\
-	(method)CLASS::MaxMethodFloat<&CLASS::METHOD>::call,	\
-	#METHOD,												\
-	A_FLOAT,												\
-	0);	
+						(t_class *)CLASS::m_class,								\
+						(method)CLASS::MaxMethodFloat<&CLASS::METHOD>::call,	\
+						#METHOD,												\
+						A_FLOAT,												\
+						0); 
 	
 // for A_INT methods (long v):
-#define REGISTER_METHOD_LONG(CLASS, METHOD)	class_addmethod(	\
-	(t_class *)CLASS::m_class,								\
-	(method)CLASS::MaxMethodLong<&CLASS::METHOD>::call,	\
-	#METHOD,												\
-	A_LONG,												\
-	0);
+#define REGISTER_METHOD_LONG(CLASS, METHOD) class_addmethod(	\
+						(t_class *)CLASS::m_class,							\
+						(method)CLASS::MaxMethodLong<&CLASS::METHOD>::call, \
+						#METHOD,											\
+						A_LONG,												\
+						0);
+
+// used for registering methods for clocks (probably other things also)
+#define TO_METHOD_NONE(CLASS, METHOD) ((method)CLASS::MaxMethodNone<&CLASS::METHOD>::call)
 	
 // for DSP
 #define REGISTER_PERFORM(CLASS, METHOD) object_method( \
@@ -103,22 +155,84 @@ public:
 		static void call(T * x, t_symbol * s, long ac, t_atom * av) { ((x)->*F)(proxy_getinlet((t_object *)x), s, ac, av); }
 	};
 	
+	typedef t_max_err (T::*maxmethodgimmeback)(t_symbol *s, long ac, t_atom *av, t_atom *rv);
+	template<maxmethodgimmeback F>
+	struct MaxMethodGimmeback {
+		static t_max_err call(T * x, t_symbol * s, long ac, t_atom * av, t_atom *rv) { return ((x)->*F)(s, ac, av, rv); }
+	};
+	
 	typedef void (T::*maxmethod)(long inlet);
 	template<maxmethod F>
 	struct MaxMethod {
 		static void call(T * x) { ((x)->*F)(proxy_getinlet((t_object *)x)); }
 	};
 	
+	//A_CANT for dblclick
+	typedef void (T::*maxmethodcant)(long inlet);
+	template<maxmethodcant F>
+	struct MaxMethodCant {
+		static void call(T * x) { ((x)->*F)(proxy_getinlet((t_object *)x)); }
+	};
+		
+	//A_CANT for paint
+	typedef void (T::*maxmethodpaint)(long inlet, char** text, long size);
+	template<maxmethodpaint F>
+	struct MaxMethodPaint {
+		static void call(T * x, t_object *view) { ((x)->*F)(proxy_getinlet((t_object *)x), view); }
+	};
+		
+	//A_CANT for drag
+	typedef long (T::*maxmethoddrag)(t_object *drag, t_object *view);
+	template<maxmethoddrag F>
+	struct MaxMethodDrag {
+		static long call(T * x, t_object *drag, t_object *view) { return ((x)->*F)(drag, view); }
+	};
+
+	//A_CANT for edclose and edsave
+	typedef void (T::*maxmethodedclose)(long inlet, char** text, long size);
+	template<maxmethodedclose F>
+	struct MaxMethodEdClose {
+		static void call(T * x, char** text, long size) { ((x)->*F)(proxy_getinlet((t_object *)x), text, size); }
+	};
+		
+	//A_CANT for assist
+	typedef void (T::*maxmethodassist)(void *b, long msg, long a, char *dst);
+	template<maxmethodassist F>
+	struct MaxMethodAssist {
+		static void call(T * x, void *b, long msg, long a, char *dst) { ((x)->*F)(b, msg, a, dst); }
+	};
+		
+	//A_CANT for jsave
+	typedef void (T::*maxmethodjsave)(t_dictionary *d);
+	template<maxmethodjsave F>
+	struct MaxMethodJsave {
+		static void call(T * x, t_dictionary *d) { ((x)->*F)(d); }
+	};
+		
+	//proxy_getinlet((t_object *)x), 
 	typedef void (T::*maxmethodlong)(long inlet, long v);
 	template<maxmethodlong F>
 	struct MaxMethodLong {
 		static void call(T * x, long v) { ((x)->*F)(proxy_getinlet((t_object *)x), v); }
 	};
+		
+	//Template que j'ai rajoute for pouvoir faire A_DEFSYM(t_symbol *s)
+	typedef void (T::*maxmethoddefsym)(long inlet, t_symbol *s);
+	template<maxmethoddefsym F>
+	struct MaxMethodDefSym {
+		static void call(T * x, t_symbol *s) { ((x)->*F)(proxy_getinlet((t_object *)x), s); }
+	};	
 	
 	typedef void (T::*maxmethodfloat)(long inlet, double v);
 	template<maxmethodfloat F>
 	struct MaxMethodFloat {
 		static void call(T * x, double v) { ((x)->*F)(proxy_getinlet((t_object *)x), v); }
+	};
+	
+	typedef void (T::*maxmethodnone)();
+	template<maxmethodnone F>
+	struct MaxMethodNone {
+		static void call(T * x) { ((x)->*F)(); }
 	};
 
 };
