@@ -42,7 +42,7 @@ public:
 //	}
 };
 
-C74_EXPORT extern "C" int main(void) {
+C74_EXPORT int main(void) {
 	// create a class with the given name:
 	Example::makeMaxClass("example~");
 	REGISTER_METHOD(Example, bang);
