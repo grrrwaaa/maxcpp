@@ -266,14 +266,24 @@ public:
 	static void maxcpp_destroy(t_object * x) {
 		T * t = (T *)x;
 		t->~T();
+		
+		// @see https://github.com/grrrwaaa/maxcpp/issues/2
+		unsigned long numinletproxies;
+		numinletproxies = sysmem_ptrsize(t->m_inletproxies)/sizeof(void*);
+
+		for (unsigned int i=0; i < numinletproxies; i++)
+		   object_free(t->m_inletproxies[i]);
+
+		sysmem_freeptr(t->m_inletproxies);
+		sysmem_freeptr(t->m_outlets);
 	}
 	
 	void setupIO(unsigned int numinlets = 1, unsigned int numoutlets = 1) {
 		if (numinlets > 0) {
 			unsigned int numproxies = numinlets - 1;
 			m_inletproxies = (void **)sysmem_newptr(sizeof(void *) * numproxies);
-			for (unsigned int i=1; i<=numproxies; i++)
-				m_inletproxies[i] = proxy_new(this, i, &this->m_whichinlet); // generic inlet
+			for (unsigned int i=0; i<numproxies; i++)
+				m_inletproxies[i] = proxy_new(this, i+1, &this->m_whichinlet); // generic inlet
 		}
 		m_outlets = (void **)sysmem_newptr(sizeof(void *) * numoutlets);
 		for (unsigned int i=0; i<numoutlets; i++)

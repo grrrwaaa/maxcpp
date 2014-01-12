@@ -16,8 +16,6 @@
 		22CF119A0EE9A8250054F513 /* example.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = example.cpp; sourceTree = "<group>"; };
 		22CF119D0EE9A82E0054F513 /* MaxAudioAPI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MaxAudioAPI.framework; path = "../../../c74support/msp-includes/MaxAudioAPI.framework"; sourceTree = SOURCE_ROOT; };
 		2FBBEAE508F335360078DB84 /* example.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = example.mxo; sourceTree = BUILT_PRODUCTS_DIR; };
-		36C5492016F557E00054C037 /* jit.cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jit.cpp.h; sourceTree = "<group>"; };
-		36C5492116F557E00054C037 /* max.jit.cpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = max.jit.cpp.h; sourceTree = "<group>"; };
 		36C5493616F558AA0054C037 /* maxcpp6.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = maxcpp6.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -57,8 +55,6 @@
 			isa = PBXGroup;
 			children = (
 				36C5493616F558AA0054C037 /* maxcpp6.h */,
-				36C5492016F557E00054C037 /* jit.cpp.h */,
-				36C5492116F557E00054C037 /* max.jit.cpp.h */,
 			);
 			name = maxcpp;
 			path = ../../maxcpp;
