@@ -1,4 +1,4 @@
-#include "maxcpp6.h"
+#include "../maxcpp/maxcpp6.h"
 
 // inherit from the MSP base class, template-specialized for myself:
 
@@ -18,6 +18,13 @@ public:
 	void bang(long inlet) { 
 		post("bang in inlet %i!", inlet); 
 	}
+
+    void assist(void *b, long m, long a, char *s) {   //inlet-outlet assistant
+        if (m == ASSIST_INLET) 		// inlet
+                sprintf(s, "input %i", a);
+        else 						// outlet
+                sprintf(s, "output");		
+    }
 	void test(long inlet, t_symbol * s, long ac, t_atom * av) { 
 		post("%s in inlet %i (%i args)", s->s_name, inlet, ac);
 	}
@@ -46,5 +53,6 @@ C74_EXPORT int main(void) {
 	// create a class with the given name:
 	Example::makeMaxClass("example~");
 	REGISTER_METHOD(Example, bang);
+	REGISTER_METHOD_ASSIST(Example, assist);
 	REGISTER_METHOD_GIMME(Example, test);
 }

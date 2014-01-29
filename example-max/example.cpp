@@ -1,4 +1,4 @@
-#include "maxcpp6.h"
+#include "../maxcpp/maxcpp6.h"
 
 class Example : public MaxCpp6<Example> {
 public:
@@ -11,6 +11,15 @@ public:
 	void bang(long inlet) { 
 		outlet_bang(m_outlets[0]);
 	}
+
+    void assist(void *b, long m, long a, char *s)    //inlet-outlet assistant
+        {
+            if (m == ASSIST_INLET)	// inlet
+                 sprintf(s, "input %i", a);
+            else					// outlet
+                 sprintf(s, "output");		
+        }
+
 	void testfloat(long inlet, double v) { 
 		outlet_float(m_outlets[0], v);
 	}
@@ -26,6 +35,7 @@ C74_EXPORT int main(void) {
 	// create a class with the given name:
 	Example::makeMaxClass("example");
 	REGISTER_METHOD(Example, bang);
+	REGISTER_METHOD_ASSIST(Example, assist);
 	REGISTER_METHOD_FLOAT(Example, testfloat);
 	REGISTER_METHOD_LONG(Example, testint);
 	REGISTER_METHOD_GIMME(Example, test);
