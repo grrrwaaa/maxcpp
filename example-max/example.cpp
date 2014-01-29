@@ -14,14 +14,10 @@ public:
 
     void assist(void *b, long m, long a, char *s)    //inlet-outlet assistant
         {
-            if (m == ASSIST_INLET)			// inlet
-            { 
+            if (m == ASSIST_INLET)	// inlet
                  sprintf(s, "input %i", a);
-            } 
-            else							// outlet
-            {	
+            else					// outlet
                  sprintf(s, "output");		
-            }
         }
 
 	void testfloat(long inlet, double v) { 
