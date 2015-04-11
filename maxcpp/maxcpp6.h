@@ -400,7 +400,12 @@ class JboxCpp6 : public MaxCppBase<T> {
 public:
 	t_jbox m_ob;
 	long m_flags;
-
+	void **	m_outlets;
+	void **	m_inletproxies;
+	long m_whichinlet;
+	long m_inlet_count;
+	long m_outlet_count;
+	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	static t_class* makeMaxClass(const char *classname,long jboxflags = 0,const char *defaultrect = "0 0 100 100"){
@@ -432,6 +437,8 @@ public:
 		jbox_new(&((T *)x)->m_ob, ((T *)x)->m_flags , ac, av);
 		((T *)x)->m_ob.b_firstin = (t_object*)(T *)x;
 
+		((T *)x)->setupIOclass();
+
 		attr_dictionary_process((T *)x, d);
 		jbox_ready(&((T *)x)->m_ob);
 
@@ -442,12 +449,36 @@ public:
 		jbox_free(&((T *)x)->m_ob);	
 		T *t = (T *)x;
 		t->~T();
+		// @see https://github.com/grrrwaaa/maxcpp/issues/2
+
+		for (unsigned int i=0; i < m_inlet_count; i++)
+		   object_free(t->m_inletproxies[i]);
+
+		sysmem_freeptr(t->m_inletproxies);
+		sysmem_freeptr(t->m_outlets);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void setupJbox(long jboxflags){
 		m_flags |= jboxflags ;
+	}
+	
+	void setupIO(unsigned int numinlets = 1, unsigned int numoutlets = 1) {
+		m_inlet_count = numinlets ;
+		m_outlet_count = numoutlets;
+	}
+	
+	void setupIOclass(){
+		if (m_inlet_count > 0) {
+			unsigned int numproxies = m_inlet_count - 1;
+			m_inletproxies = (void **)sysmem_newptr(sizeof(void *) * numproxies);
+			for (unsigned int i=0; i<numproxies; i++)
+				m_inletproxies[i] = proxy_new(this, i+1, &this->m_whichinlet); // generic inlet
+		}
+		m_outlets = (void **)sysmem_newptr(sizeof(void *) * m_outlet_count);
+		for (unsigned int i=0; i<m_outlet_count; i++)
+			m_outlets[m_outlet_count - i - 1] = outlet_new(this, NULL); // generic outlet	
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
