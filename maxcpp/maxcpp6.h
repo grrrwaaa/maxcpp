@@ -451,7 +451,7 @@ public:
 		t->~T();
 		// @see https://github.com/grrrwaaa/maxcpp/issues/2
 
-		for (unsigned int i=0; i < m_inlet_count; i++)
+		for (unsigned int i=0; i < t->m_inlet_count-1; i++)
 		   object_free(t->m_inletproxies[i]);
 
 		sysmem_freeptr(t->m_inletproxies);
