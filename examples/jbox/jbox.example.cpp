@@ -15,16 +15,17 @@ public:
 	// constructor :
 	Example(){
 		setupIO(1,1);
-		setupJbox(JBOX_DRAWFIRSTIN | JBOX_DRAWINLAST);
+		setupJbox(JBOX_DRAWFIRSTIN);
 		setupJbox(JBOX_DRAWBACKGROUND);
 		setupJbox(JBOX_GROWBOTH);
+		// setupJbox(JBOX_DRAWINLAST);
 		// setupJbox(JBOX_NODRAWBOX);
 		// setupJbox(JBOX_TRANSPARENT);			
 		// setupJbox(JBOX_MOUSEDRAGDELTA);
 		// setupJbox(JBOX_BACKGROUND);
 		// setupJbox(JBOX_NOGROW);
 		// setupJbox(JBOX_GROWY);
-		// setupJbox(JBOX_TEXTFIELD;
+		// setupJbox(JBOX_TEXTFIELD);
 		attr_bgcolor.red = attr_bgcolor.green = attr_bgcolor.blue = 0.0;
 		attr_textcolor.red = attr_textcolor.green = attr_bgcolor.alpha = 1.0;
 		attr_textcolor.alpha = attr_textcolor.blue = 1.0 ;
@@ -89,7 +90,7 @@ int C74_EXPORT main(void){
 	Example::makeMaxClass("jbox.example",/*JBOX_COLOR |*/ JBOX_FIXWIDTH | JBOX_FONTATTR);
 
 	// methods
-	REGISTER_METHOD_MESSAGE(Example, bang);
+	REGISTER_METHOD(Example, bang);
 	REGISTER_METHOD_MOUSE(Example, mousedown);
 
 	// TO DO - ALIASES for ATTR registation
