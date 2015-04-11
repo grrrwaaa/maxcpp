@@ -14,6 +14,7 @@ public:
 
 	// constructor :
 	Example(){
+		setupIO(1,1);
 		setupJbox(JBOX_DRAWFIRSTIN | JBOX_DRAWINLAST);
 		setupJbox(JBOX_DRAWBACKGROUND);
 		setupJbox(JBOX_GROWBOTH);
