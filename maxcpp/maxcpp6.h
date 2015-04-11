@@ -403,7 +403,7 @@ public:
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	static t_class* CreateMaxClass(const char *classname,long jboxflags = 0,const char *defaultrect = "0 0 100 100"){
+	static t_class* makeMaxClass(const char *classname,long jboxflags = 0,const char *defaultrect = "0 0 100 100"){
 		common_symbols_init();
 		t_class *c = class_new(classname,(method)JboxCpp6<T>::maxcpp_create,(method)JboxCpp6<T>::maxcpp_destroy,sizeof(T),nullptr,A_GIMME,0);
 		c->c_flags |= CLASS_FLAG_NEWDICTIONARY;
