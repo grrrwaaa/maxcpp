@@ -14,9 +14,9 @@ public:
 
 	// constructor :
 	Example(){
-		SetupJbox(JBOX_DRAWFIRSTIN | JBOX_DRAWINLAST);
-		SetupJbox(JBOX_DRAWBACKGROUND);
-		SetupJbox(JBOX_GROWBOTH);
+		setupJbox(JBOX_DRAWFIRSTIN | JBOX_DRAWINLAST);
+		setupJbox(JBOX_DRAWBACKGROUND);
+		setupJbox(JBOX_GROWBOTH);
 		// SetupJbox(JBOX_NODRAWBOX);
 		// SetupJbox(JBOX_TRANSPARENT);			
 		// SetupJbox(JBOX_MOUSEDRAGDELTA);
