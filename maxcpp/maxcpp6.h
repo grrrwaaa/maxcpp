@@ -127,6 +127,13 @@ THE SOFTWARE.
 						#METHOD,											\
 						A_LONG,												\
 						0);
+// for A_CANT method (notify)						
+#define REGISTER_NOTIFY(CLASS) class_addmethod(									\
+						(t_class *)CLASS::m_class,								\
+						(method)CLASS::MaxMethodNotify<&CLASS::notify>::call,	\
+						"notify",												\
+						A_CANT,													\
+						0);
 
 // used for registering methods for clocks (probably other things also)
 #define TO_METHOD_NONE(CLASS, METHOD) ((method)CLASS::MaxMethodNone<&CLASS::METHOD>::call)
@@ -227,6 +234,13 @@ public:
 	template<maxmethodfloat F>
 	struct MaxMethodFloat {
 		static void call(T * x, double v) { ((x)->*F)(proxy_getinlet((t_object *)x), v); }
+	};
+	
+	//A_CANT for notify
+	typedef t_max_err (T::*maxmethodnotify)(t_symbol *s, t_symbol *msg, void *sender, void *data);
+	template<maxmethodnotify F>
+	struct MaxMethodNotify{
+		static t_max_err call(T * x, t_symbol *s, t_symbol *msg, void *sender, void *data) {return ((x)->*F)(s, msg, sender, data); }
 	};
 	
 	typedef void (T::*maxmethodnone)();
