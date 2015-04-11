@@ -45,6 +45,11 @@ THE SOFTWARE.
 #include "commonsyms.h"
 #include "z_dsp.h"
 
+// uncomment for jbox
+/*
+#include "jpatcher_api.h"
+#include "jgraphics.h"
+*/
 #include <new>
 
 #define MAX_CPP_VERSION	0.600
