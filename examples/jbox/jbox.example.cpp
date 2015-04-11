@@ -92,17 +92,17 @@ int C74_EXPORT main(void){
 	REGISTER_METHOD_MOUSE(Example, mousedown);
 
 	// TO DO - ALIASES for ATTR registation
-	CLASS_STICKY_ATTR(Empty::m_class, "category", 0, "Color");
+	CLASS_STICKY_ATTR(Example::m_class, "category", 0, "Color");
 
-	CLASS_ATTR_RGBA(Empty::m_class, "bgcolor", 0, Empty, attr_bgcolor); 
-	CLASS_ATTR_DEFAULTNAME_SAVE_PAINT(Empty::m_class, "bgcolor", 0, "0.28 0.84 1 0.4"); 
-	CLASS_ATTR_STYLE_LABEL(Empty::m_class,"bgcolor",0,"rgba","Background Color");
+	CLASS_ATTR_RGBA(Example::m_class, "bgcolor", 0, Example, attr_bgcolor); 
+	CLASS_ATTR_DEFAULTNAME_SAVE_PAINT(Example::m_class, "bgcolor", 0, "0.28 0.84 1 0.4"); 
+	CLASS_ATTR_STYLE_LABEL(Example::m_class,"bgcolor",0,"rgba","Background Color");
 	
-	CLASS_ATTR_RGBA(Empty::m_class, "textcolor", 0, Empty, attr_textcolor); 
-	CLASS_ATTR_DEFAULTNAME_SAVE_PAINT(Empty::m_class, "textcolor", 0, "0.83 0.83 0.83 1"); 
-	CLASS_ATTR_STYLE_LABEL(Empty::m_class,"textcolor",0,"rgba","Text Color");
+	CLASS_ATTR_RGBA(Example::m_class, "textcolor", 0, Example, attr_textcolor); 
+	CLASS_ATTR_DEFAULTNAME_SAVE_PAINT(Example::m_class, "textcolor", 0, "0.83 0.83 0.83 1"); 
+	CLASS_ATTR_STYLE_LABEL(Example::m_class,"textcolor",0,"rgba","Text Color");
 
-	CLASS_STICKY_ATTR_CLEAR(Empty::m_class, "category");
+	CLASS_STICKY_ATTR_CLEAR(Example::m_class, "category");
 
 	return 0;
 }
