@@ -43,13 +43,11 @@ THE SOFTWARE.
 #include "ext_obex.h"
 #include "ext_common.h"
 #include "commonsyms.h"
-#include "z_dsp.h"
-
-// uncomment for jbox
-/*
 #include "jpatcher_api.h"
 #include "jgraphics.h"
-*/
+#include "z_dsp.h"
+#include "max.attr.h"
+
 #include <new>
 
 #define MAX_CPP_VERSION	0.600
@@ -150,6 +148,10 @@ THE SOFTWARE.
 
 // used for registering methods for clocks and other delegate methods (i.e defer_low)
 #define TO_METHOD_NONE(CLASS, METHOD) ((method)CLASS::MaxMethodNone<&CLASS::METHOD>::call)
+
+// used for attr accessors
+#define TO_METHOD_GET(CLASS, METHOD) ((method)CLASS::MaxMethodAccessorGet<&CLASS::METHOD>::call)
+#define TO_METHOD_SET(CLASS, METHOD) ((method)CLASS::MaxMethodAccessorSet<&CLASS::METHOD>::call)
 	
 // for DSP
 #define REGISTER_PERFORM(CLASS, METHOD) object_method( \
@@ -269,6 +271,18 @@ public:
 	template<maxmethodnone F>
 	struct MaxMethodNone {
 		static void call(T * x) { ((x)->*F)(); }
+	};
+	// (method) attr get accessor
+	typedef t_max_err (T::*maxmethodaccessorget)(long *ac, t_atom **av);
+	template<maxmethodaccessorget F>
+	struct MaxMethodAccessorGet {
+		static t_max_err call(T * x, void *attr, long *ac, t_atom **av) { return ((x)->*F)(ac, av); }
+	};
+	// (method) attr set accessor
+	typedef t_max_err (T::*maxmethodaccessorset)(long ac, t_atom *av);
+	template<maxmethodaccessorset F>
+	struct MaxMethodAccessorSet {
+		static t_max_err call(T * x, void *attr, long ac, t_atom *av) { return ((x)->*F)(ac, av); }
 	};
 
 };
