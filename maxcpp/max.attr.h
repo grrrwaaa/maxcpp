@@ -21,16 +21,16 @@
 */
 #define ATTR_ACCESSORS(objclass,attrname,getter,setter) \
 	{ t_object *theattr=(t_object *)class_attr_get(objclass::m_class,gensym(attrname)); \
-		object_method(theattr,gensym("setmethod"),USESYM(get),AS_METHOD_GET(objclass,getter)); \
-		object_method(theattr,gensym("setmethod"),USESYM(set),AS_METHOD_SET(objclass,setter)); }
+		object_method(theattr,gensym("setmethod"),USESYM(get),TO_METHOD_GET(objclass,getter)); \
+		object_method(theattr,gensym("setmethod"),USESYM(set),TO_METHOD_SET(objclass,setter)); }
 
 #define ATTR_GET_ACCESSOR(objclass,attrname,getter) \
 	{ t_object *theattr=(t_object *)class_attr_get(objclass::m_class,gensym(attrname)); \
-		object_method(theattr,gensym("setmethod"),USESYM(get),AS_METHOD_GET(objclass,getter)); }
+		object_method(theattr,gensym("setmethod"),USESYM(get),TO_METHOD_GET(objclass,getter)); }
 
 #define ATTR_SET_ACCESSOR(objclass,attrname,setter) \
 	{ t_object *theattr=(t_object *)class_attr_get(objclass::m_class,gensym(attrname)); \
-		object_method(theattr,gensym("setmethod"),USESYM(set),AS_METHOD_SET(objclass,setter)); }
+		object_method(theattr,gensym("setmethod"),USESYM(set),TO_METHOD_SET(objclass,setter)); }
 		
 /**
 	Create a char attribute and add it to a Max class.
