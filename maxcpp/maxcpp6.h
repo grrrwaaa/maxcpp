@@ -282,8 +282,8 @@ public:
 		if (numinlets > 0) {
 			unsigned int numproxies = numinlets - 1;
 			m_inletproxies = (void **)sysmem_newptr(sizeof(void *) * numproxies);
-            for (unsigned int i=numproxies; 0<i; i--)
-                m_inletproxies[i - 1] = proxy_new(this, i, &this->m_whichinlet); // generic inlet
+			for (unsigned int i=numproxies; 0<i; i--)
+				m_inletproxies[i - 1] = proxy_new(this, i, &this->m_whichinlet); // generic inlet
 		}
 		m_outlets = (void **)sysmem_newptr(sizeof(void *) * numoutlets);
 		for (unsigned int i=0; i<numoutlets; i++)
