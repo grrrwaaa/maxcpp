@@ -121,8 +121,14 @@ THE SOFTWARE.
 						(method)CLASS::MaxMethodFloat<&CLASS::METHOD>::call,	\
 						#METHOD,												\
 						A_FLOAT,												\
-						0); 
-	
+						0);
+// alternate for handling raw float/double data (since float is a reserved word in C++)
+#define REGISTER_INLET_FLOAT(CLASS, METHOD)	class_addmethod(	\
+						(t_class *)CLASS::m_class,								\
+						(method)CLASS::MaxMethodFloat<&CLASS::METHOD>::call,	\
+						"float",												\
+						A_FLOAT,												\
+						0);
 // for A_INT methods (long v):
 #define REGISTER_METHOD_LONG(CLASS, METHOD) class_addmethod(	\
 						(t_class *)CLASS::m_class,							\
@@ -130,7 +136,15 @@ THE SOFTWARE.
 						#METHOD,											\
 						A_LONG,												\
 						0);
-// for A_CANT method (notify)						
+// alternate for handling raw int/long data (since int/long are reserved words in C++)
+#define REGISTER_INLET_LONG(CLASS, METHOD) class_addmethod(	\
+						(t_class *)CLASS::m_class,							\
+						(method)CLASS::MaxMethodLong<&CLASS::METHOD>::call, \
+						"int",											\
+						A_LONG,												\
+						0);
+
+// for A_CANT method (notify)
 #define REGISTER_METHOD_NOTIFY(CLASS) class_addmethod(									\
 						(t_class *)CLASS::m_class,								\
 						(method)CLASS::MaxMethodNotify<&CLASS::notify>::call,	\
