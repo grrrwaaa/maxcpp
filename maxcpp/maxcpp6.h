@@ -43,7 +43,10 @@ THE SOFTWARE.
 #include "ext_obex.h"
 #include "ext_common.h"
 #include "commonsyms.h"
+#include "jpatcher_api.h"
+#include "jgraphics.h"
 #include "z_dsp.h"
+#include "max.attr.h"
 
 #include <new>
 
@@ -127,9 +130,28 @@ THE SOFTWARE.
 						#METHOD,											\
 						A_LONG,												\
 						0);
+// for A_CANT method (notify)						
+#define REGISTER_METHOD_NOTIFY(CLASS) class_addmethod(									\
+						(t_class *)CLASS::m_class,								\
+						(method)CLASS::MaxMethodNotify<&CLASS::notify>::call,	\
+						"notify",												\
+						A_CANT,													\
+						0);
+// JBOX Methods
+// for A_CANT methods (mouse):
+#define REGISTER_METHOD_MOUSE(CLASS, METHOD) class_addmethod(							\
+						(t_class *)CLASS::m_class,								\
+						(method)CLASS::MaxMethodMouse<&CLASS::METHOD>::call,	\
+						#METHOD,												\
+						A_CANT,													\
+						0); 
 
-// used for registering methods for clocks (probably other things also)
+// used for registering methods for clocks and other delegate methods (i.e defer_low)
 #define TO_METHOD_NONE(CLASS, METHOD) ((method)CLASS::MaxMethodNone<&CLASS::METHOD>::call)
+
+// used for attr accessors
+#define TO_METHOD_GET(CLASS, METHOD) ((method)CLASS::MaxMethodAccessorGet<&CLASS::METHOD>::call)
+#define TO_METHOD_SET(CLASS, METHOD) ((method)CLASS::MaxMethodAccessorSet<&CLASS::METHOD>::call)
 	
 // for DSP
 #define REGISTER_PERFORM(CLASS, METHOD) object_method( \
@@ -172,13 +194,6 @@ public:
 	template<maxmethodcant F>
 	struct MaxMethodCant {
 		static void call(T * x) { ((x)->*F)(proxy_getinlet((t_object *)x)); }
-	};
-		
-	//A_CANT for paint
-	typedef void (T::*maxmethodpaint)(long inlet, char** text, long size);
-	template<maxmethodpaint F>
-	struct MaxMethodPaint {
-		static void call(T * x, t_object *view) { ((x)->*F)(proxy_getinlet((t_object *)x), view); }
 	};
 		
 	//A_CANT for drag
@@ -229,16 +244,51 @@ public:
 		static void call(T * x, double v) { ((x)->*F)(proxy_getinlet((t_object *)x), v); }
 	};
 	
+	//A_CANT for notify
+	typedef t_max_err (T::*maxmethodnotify)(t_symbol *s, t_symbol *msg, void *sender, void *data);
+	template<maxmethodnotify F>
+	struct MaxMethodNotify{
+		static t_max_err call(T * x, t_symbol *s, t_symbol *msg, void *sender, void *data) {return ((x)->*F)(s, msg, sender, data); }
+	};
+	
+	//JBOX methods
+	//A_CANT for paint
+	typedef void (T::*maxmethodpaint)(t_object *view);
+	template<maxmethodpaint F>
+	struct MaxMethodPaint {
+		static void call(T * x, t_object *view) { ((x)->*F)(view); }
+	};
+	
+	//A_CANT mouse
+	typedef void (T::*maxmethodmouse)(t_object *patcherview, t_pt pt, long modifiers);
+	template<maxmethodmouse F>
+	struct MaxMethodMouse {
+		static void call(T * x,t_object *patcherview, t_pt pt, long modifiers) { ((x)->*F)(patcherview,pt,modifiers); }
+	};
+	
+	///////////////////////////////////////////////////////////////////////////////////
 	typedef void (T::*maxmethodnone)();
 	template<maxmethodnone F>
 	struct MaxMethodNone {
 		static void call(T * x) { ((x)->*F)(); }
 	};
+	// (method) attr get accessor
+	typedef t_max_err (T::*maxmethodaccessorget)(long *ac, t_atom **av);
+	template<maxmethodaccessorget F>
+	struct MaxMethodAccessorGet {
+		static t_max_err call(T * x, void *attr, long *ac, t_atom **av) { return ((x)->*F)(ac, av); }
+	};
+	// (method) attr set accessor
+	typedef t_max_err (T::*maxmethodaccessorset)(long ac, t_atom *av);
+	template<maxmethodaccessorset F>
+	struct MaxMethodAccessorSet {
+		static t_max_err call(T * x, void *attr, long ac, t_atom *av) { return ((x)->*F)(ac, av); }
+	};
 
 };
 
 // note: only include this file once to prevent linker errors!
-template<typename T> t_class * MaxCppBase<T>::m_class = 0;
+template<typename T> t_class * MaxCppBase<T>::m_class = nullptr;
 
 // inherit from this one for non-audio objects
 template <typename T>
@@ -251,7 +301,7 @@ public:
 	
 	static t_class * makeMaxClass(const char * classname) {
 		common_symbols_init();
-		t_class * c = class_new(classname, (method)MaxCpp6<T>::maxcpp_create, (method)MaxCpp6<T>::maxcpp_destroy, sizeof(T), NULL, A_GIMME, 0);
+		t_class * c = class_new(classname, (method)MaxCpp6<T>::maxcpp_create, (method)MaxCpp6<T>::maxcpp_destroy, sizeof(T), nullptr, A_GIMME, 0);
 		class_register(CLASS_BOX, c);
 		MaxCppBase<T>::m_class = c;
 		return c;
@@ -298,7 +348,8 @@ public:
 template <typename T>
 class MspCpp6 : public MaxCppBase<T> {
 public:
-
+	t_pxobject m_ob;
+	
 	typedef void (T::*maxmethod_perform64)(double **ins, long numins, double **outs, long numouts, long sampleframes);
 	template<maxmethod_perform64 F>
 	struct MaxMethodPerform64 {
@@ -307,9 +358,6 @@ public:
 		}
 	};
 
-	t_pxobject m_ob; 
-	
-	
 	static t_class * makeMaxClass(const char * classname) {
 		common_symbols_init();
 		t_class * c = class_new(classname, (method)MspCpp6<T>::maxcpp_create, (method)MspCpp6<T>::maxcpp_destroy, sizeof(T), NULL, A_GIMME, 0);
@@ -360,5 +408,120 @@ public:
 	operator t_object & () { return m_ob; }
 };
 
+// inherit from this one for jbox objects
+template <typename T>
+class JboxCpp6 : public MaxCppBase<T> {
+public:
+	t_jbox m_ob;
+	long m_flags;
+	void **	m_outlets;
+	void **	m_inletproxies;
+	long m_whichinlet;
+	long m_inlet_count;
+	long m_outlet_count;
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	static t_class* makeMaxClass(const char *classname,long jboxflags = 0,const char *defaultrect = "0 0 100 100"){
+		common_symbols_init();
+		t_class *c = class_new(classname,(method)JboxCpp6<T>::maxcpp_create,(method)JboxCpp6<T>::maxcpp_destroy,sizeof(T),nullptr,A_GIMME,0);
+		c->c_flags |= CLASS_FLAG_NEWDICTIONARY;
+
+		jbox_initclass(c,jboxflags);
+
+		class_addmethod(c, (method)JboxCpp6<T>::notify_class,"notify", A_CANT, 0);
+		class_addmethod(c, (method)JboxCpp6<T>::paint_class, "paint", A_CANT, 0);
+
+		// default size
+		CLASS_ATTR_DEFAULT(c, "patching_rect", 0, defaultrect);
+
+		class_register(CLASS_BOX, c);
+		MaxCppBase<T>::m_class = c;
+
+		return c;
+	}
+	
+	static void* maxcpp_create(t_symbol * sym, long ac, t_atom * av){
+		void *x = object_alloc(MaxCppBase<T>::m_class);
+		((T *)x)->m_flags = 0 ;		
+		new(x) T();
+
+		t_dictionary *d = object_dictionaryarg(ac,av) ;
+
+		jbox_new(&((T *)x)->m_ob, ((T *)x)->m_flags , ac, av);
+		((T *)x)->m_ob.b_firstin = (t_object*)(T *)x;
+
+		((T *)x)->setupIOclass();
+
+		attr_dictionary_process((T *)x, d);
+		jbox_ready(&((T *)x)->m_ob);
+
+		return (T *)x; 
+	}
+	
+	static void maxcpp_destroy(t_jbox * x){
+		jbox_free(&((T *)x)->m_ob);	
+		T *t = (T *)x;
+		t->~T();
+		// @see https://github.com/grrrwaaa/maxcpp/issues/2
+
+		for (unsigned int i=0; i < t->m_inlet_count-1; i++)
+		   object_free(t->m_inletproxies[i]);
+
+		sysmem_freeptr(t->m_inletproxies);
+		sysmem_freeptr(t->m_outlets);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	void setupJbox(long jboxflags){
+		m_flags |= jboxflags ;
+	}
+	
+	void setupIO(unsigned int numinlets = 1, unsigned int numoutlets = 1) {
+		m_inlet_count = numinlets ;
+		m_outlet_count = numoutlets;
+	}
+	
+	void setupIOclass(){
+		if (m_inlet_count > 0) {
+			unsigned int numproxies = m_inlet_count - 1;
+			m_inletproxies = (void **)sysmem_newptr(sizeof(void *) * numproxies);
+			for (unsigned int i=0; i<numproxies; i++)
+				m_inletproxies[i] = proxy_new(this, i+1, &this->m_whichinlet); // generic inlet
+		}
+		m_outlets = (void **)sysmem_newptr(sizeof(void *) * m_outlet_count);
+		for (unsigned int i=0; i<m_outlet_count; i++)
+			m_outlets[m_outlet_count - i - 1] = outlet_new(this, NULL); // generic outlet	
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	static void paint_class(t_object *x,t_object *view){
+		t_rect rect;
+		t_jgraphics *g = (t_jgraphics*)patcherview_get_jgraphics(view);
+		jbox_get_rect_for_view(x, view, &rect);
+		((T *)x)->paint(g, view, rect);
+	}
+
+	void paint(t_jgraphics *g, t_object *view , t_rect rect){}	
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	static t_max_err notify_class(t_object *x,symbol *s, symbol *msg, void *sender, void *data){
+		return ((T *)x)->notify(s, msg, sender, data);
+	}
+
+	t_max_err notify(symbol *s, symbol *msg, void *sender, void *data){
+		return jbox_notify((t_jbox *)this, s, msg, sender, data);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// C++ operator overload to treat JboxCpp6 objects as t_jbox and t_object
+	operator t_jbox & () { return m_ob; }
+	operator t_object & () { return m_ob; }
+};
 
 #endif
