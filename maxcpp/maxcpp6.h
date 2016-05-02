@@ -288,7 +288,7 @@ public:
 };
 
 // note: only include this file once to prevent linker errors!
-template<typename T> t_class * MaxCppBase<T>::m_class = nullptr;
+template<typename T> t_class * MaxCppBase<T>::m_class = 0;
 
 // inherit from this one for non-audio objects
 template <typename T>
@@ -301,7 +301,7 @@ public:
 	
 	static t_class * makeMaxClass(const char * classname) {
 		common_symbols_init();
-		t_class * c = class_new(classname, (method)MaxCpp6<T>::maxcpp_create, (method)MaxCpp6<T>::maxcpp_destroy, sizeof(T), nullptr, A_GIMME, 0);
+		t_class * c = class_new(classname, (method)MaxCpp6<T>::maxcpp_create, (method)MaxCpp6<T>::maxcpp_destroy, sizeof(T), 0, A_GIMME, 0);
 		class_register(CLASS_BOX, c);
 		MaxCppBase<T>::m_class = c;
 		return c;
@@ -424,7 +424,7 @@ public:
 
 	static t_class* makeMaxClass(const char *classname,long jboxflags = 0,const char *defaultrect = "0 0 100 100"){
 		common_symbols_init();
-		t_class *c = class_new(classname,(method)JboxCpp6<T>::maxcpp_create,(method)JboxCpp6<T>::maxcpp_destroy,sizeof(T),nullptr,A_GIMME,0);
+		t_class *c = class_new(classname,(method)JboxCpp6<T>::maxcpp_create,(method)JboxCpp6<T>::maxcpp_destroy,sizeof(T),0,A_GIMME,0);
 		c->c_flags |= CLASS_FLAG_NEWDICTIONARY;
 
 		jbox_initclass(c,jboxflags);
