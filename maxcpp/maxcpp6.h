@@ -83,6 +83,14 @@ THE SOFTWARE.
 						A_CANT,			\
 						0); 
 
+// for A_CANT methods (assist):
+#define REGISTER_METHOD_LOADBANG(CLASS, METHOD) class_addmethod(    \
+                        (t_class *)CLASS::m_class,                                \
+                        (method)CLASS::MaxMethodLoadBang<&CLASS::METHOD>::call, \
+                        #METHOD,        \
+                        A_CANT,         \
+                        0);
+
 // for A_CANT methods (jsave)
 #define REGISTER_METHOD_JSAVE(CLASS, METHOD)	class_addmethod(	\
 						(t_class *)CLASS::m_class,								\
@@ -231,6 +239,13 @@ public:
 		static void call(T * x, void *b, long msg, long a, char *dst) { ((x)->*F)(b, msg, a, dst); }
 	};
 		
+    //A_CANT for loadbang
+    typedef void (T::*maxmethodloadbang)(void *b);
+    template<maxmethodloadbang F>
+    struct MaxMethodLoadBang {
+        static void call(T * x, void *b) { ((x)->*F)(b); }
+    };
+    
 	//A_CANT for jsave
 	typedef void (T::*maxmethodjsave)(t_dictionary *d);
 	template<maxmethodjsave F>
